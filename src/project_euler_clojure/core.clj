@@ -1,9 +1,6 @@
 (ns project-euler-clojure.core
-  ;; TODO: I might not be using multiset and/or specter
   (:require [clojure.core.logic :refer :all]
-            [clojure.core.logic.fd :as fd]
-            [com.rpl.specter :as specter]
-            [multiset.core :as ms]))
+            [clojure.core.logic.fd :as fd]))
 
 ;;; Problem 7
 (def primes
@@ -15,34 +12,6 @@
 (def nth-prime (comp (partial nth primes) dec))
 
 (def problem-7 (nth-prime 10001))
-
-#_
-(def digit-factors
-  (->> {0 [0]
-        1 [1]
-        2 [2]
-        3 [3]
-        4 [2 2]
-        5 [5]
-        6 [2 3]
-        7 [7]
-        8 [2 2 2]
-        9 [3 3]}
-       (specter/transform [specter/MAP-VALS] (partial into (ms/multiset)))))
-
-#_
-(defn product-less?
-  "True iff the product of the elements of left is less than the
-  product of right."
-  [left right]
-  (let [factor                       (partial mapcat digit-factors)
-        [left-factors right-factors] (map factor [left right])
-        common-factors               (ms/intersect left-factors right-factors)
-        [unique-left-factors
-         unique-right-factors]       (map #(ms/minus % common-factors)
-                                          [left-factors right-factors])]
-    (or (some zero? left-factors)
-        (< (reduce * unique-left-factors) (reduce * unique-right-factors)))))
 
 ;;; Problem 8
 (def problem-8-digits
@@ -106,23 +75,6 @@
       (= 1000 (+ a b c))))
    first
    (reduce *)))
-
-;;; Problem 12
-(def nonzero-naturals (-> (range) rest))
-(def triangulars (map #(reduce + (range 1 (inc %))) nonzero-naturals))
-
-(defn divisible-by? [n d] (= 0 (mod n d)))
-
-(defn count-divisors
-  [n]
-  (->> (range 1 (inc n))
-       (filter #(divisible-by? n %))
-       count))
-
-(defn first-divisible-triangular
-  "What is the first triangular number with more than c divisors?"
-  [c]
-  (some #(when (< c (count-divisors %)) %) triangulars))
 
 ;;; Problem 15
 (declare count-lattice-paths)
