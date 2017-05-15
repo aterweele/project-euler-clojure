@@ -16,8 +16,6 @@
 
 (def nth-prime (comp (partial nth primes) dec))
 
-(def problem-7 (nth-prime 10001))
-
 ;;; Problem 8
 (def problem-8-digits
   [7 3 1 6 7 1 7 6 5 3 1 3 3 0 6 2 4 9 1 9 2 2 5 1 1 9 6 7 4 4 2 6 5 7
@@ -71,8 +69,6 @@
          :digits  best-selection
          :product (reduce * best-selection)}))))
 
-(def problem-8 (max-subseqence-product problem-8-digits 13))
-
 ;;; Problem 9
 
 ;; This is a bit of a cheat. Problem 9 has a finite search space and
@@ -80,7 +76,8 @@
 ;; domain operators. So instead of specifying an algorithm, we specify
 ;; the appropriate constraints for a, b, and c, use core.logic to
 ;; find a solution, then take the product.
-(def problem-9
+(defn problem-9
+  []
   (->>
    (run 1 [a b c]
      ;; a, b, and c are natural numbers. Because they represent side
@@ -129,11 +126,3 @@
                        (count-lattice-paths  m (dec n)))))
 
 (def count-lattice-paths (memoize count-lattice-paths-recursive))
-
-(def problem-15 (count-lattice-paths 20 20))
-
-(def euler-solutions
-  {7  problem-7
-   8  problem-8
-   9  problem-9
-   15 problem-15})

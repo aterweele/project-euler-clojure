@@ -14,6 +14,9 @@ Print the solutions to the selected problems:
 $ lein run
 ```
 
+This may take about 2 minutes. My solutions to problems 7 and 9 are
+slightly expensive.
+
 ## License
 
 Copyright © 2017 Alex ter Weele
