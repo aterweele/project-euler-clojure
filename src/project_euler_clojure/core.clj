@@ -1,4 +1,5 @@
 (ns project-euler-clojure.core
+  (:refer-clojure :exclude [==])
   (:require [clojure.core.logic :refer :all]
             [clojure.core.logic.fd :as fd]))
 
@@ -130,3 +131,9 @@
 (def count-lattice-paths (memoize count-lattice-paths-recursive))
 
 (def problem-15 (count-lattice-paths 20 20))
+
+(def euler-solutions
+  {7  problem-7
+   8  problem-8
+   9  problem-9
+   15 problem-15})
