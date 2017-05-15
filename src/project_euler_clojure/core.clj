@@ -4,9 +4,13 @@
 
 ;;; Problem 7
 (def primes
+  "Infinite sequence of primes calculated via a seive of
+  Eratosthenes."
   (->> (range)
        ;; drop 0; 1 is not prime.
        (drop 2)
+       ;; remove every number that is divisible by some divisor d
+       ;; (1 < d < n-1)
        (remove (fn [n] (some #(zero? (mod n %)) (range 2 (dec n)))))))
 
 (def nth-prime (comp (partial nth primes) dec))
@@ -54,6 +58,9 @@
          best-selection-index 0]
     (let [best-selection (->> coll (drop best-selection-index) (take n))
           selection      (->> coll (drop i) (take n))]
+      ;; slide a window through coll until the window goes off the
+      ;; end. best-selection-index tracks the sequence of n digits
+      ;; with the highest product so far.
       (if (= (count selection) n)
         (recur (inc i)
                (if (< (reduce * best-selection) (reduce * selection))
@@ -65,27 +72,60 @@
 
 (def problem-8 (max-subseqence-product problem-8-digits 13))
 
-;; Problem 9
+;;; Problem 9
+
+;; This is a bit of a cheat. Problem 9 has a finite search space and
+;; its contraints are easily expressed via core.logic's numeric finite
+;; domain operators. So instead of specifying an algorithm, we specify
+;; the appropriate constraints for a, b, and c, use core.logic to
+;; find a solution, then take the product.
 (def problem-9
   (->>
    (run 1 [a b c]
+     ;; a, b, and c are natural numbers. Because they represent side
+     ;; lengths of a triangle, they must be at least one. Because
+     ;; their sum is 1000, none may be greater than 1000.
      (fd/in a b c (fd/interval 1 1000))
+     ;; a, b, and c must form a Pythagorean triplet.
      (fd/eq
       (= (+ (* a a) (* b b)) (* c c))
+      ;; a, b, and c sum to 1000
       (= 1000 (+ a b c))))
+   ;; get the first (only) solution.
    first
+   ;; find the product.
    (reduce *)))
 
 ;;; Problem 15
+
+;; The number of paths through the lattice is neatly solved using
+;; dynamic programming. The paths through an m by n grid can be
+;; expressed using a recurrence relation:
+
+;; T(0, 0) = 1 (This is analogous to how 0! = 1 and minimizes the
+;; number of base cases)
+
+;; T(m, 0) = T(m - 1, 0)
+
+;; T(0, n) = T(0, n - 1)
+
+;; T(m, n) = T(m - 1, n) + T(m, n - 1)
+
+;; Dynamic programming requires the use of a data structure that
+;; memoizes the results of the recurrence relation. Here, we offload
+;; that work to Clojure's memoize, so that we do not have to track the
+;; memoization data structure ourselves.
+
 (declare count-lattice-paths)
 
 (defn- count-lattice-paths-recursive
   [m n]
   (cond
     (= [0 0] [m n]) 1
-    (zero? m) (count-lattice-paths m (dec n))
-    (zero? n) (count-lattice-paths (dec m) n)
-    :else (+ (count-lattice-paths (dec m) n) (count-lattice-paths  m (dec n)))))
+    (zero? m)       (count-lattice-paths m (dec n))
+    (zero? n)       (count-lattice-paths (dec m) n)
+    :else           (+ (count-lattice-paths (dec m) n)
+                       (count-lattice-paths  m (dec n)))))
 
 (def count-lattice-paths (memoize count-lattice-paths-recursive))
 
